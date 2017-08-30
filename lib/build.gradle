@@ -1,0 +1,54 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'AndroidWeb'
+
+    publishedGroupId = 'com.gonsin.libs'
+    libraryName = 'AndroidWeb'
+    artifact = 'androidweb'
+
+    libraryDescription = '模仿springmvc在android终端，使用nanohttp实现的本地webserver'
+
+    siteUrl = 'https://github.com/dwdyoung/AndroidWeb'
+    gitUrl = 'https://github.com/dwdyoung/AndroidWeb.git'
+
+    libraryVersion = '1.0.1'
+
+    developerId = 'bear'
+    developerName = 'Bear He'
+    developerEmail = '844292769@qq.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
