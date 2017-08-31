@@ -38,13 +38,20 @@ dependencies {
     compile 'org.nanohttpd:nanohttpd:2.2.0'
 }
 
+//task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+//    classifier = 'javadoc'
+//    options.encoding = "GBK"
+//
+//    from androidJavadocs.destinationDir
+//}
+
 
 ext {
     bintrayRepo = 'maven'
     bintrayName = 'AndroidWeb'
 
     publishedGroupId = 'com.gonsin.libs'
-    libraryName = 'AndroidWeb'
+    libraryName = 'androidweb'
     artifact = 'androidweb'
 
     libraryDescription = '模仿springmvc在android终端，使用nanohttp实现的本地webserver'
@@ -63,5 +70,5 @@ ext {
     allLicenses = ["Apache-2.0"]
 }
 
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
