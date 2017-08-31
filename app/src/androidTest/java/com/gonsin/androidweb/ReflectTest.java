@@ -11,6 +11,7 @@ import com.googlecode.openbeans.BeanInfo;
 import com.googlecode.openbeans.IntrospectionException;
 import com.googlecode.openbeans.Introspector;
 import com.googlecode.openbeans.PropertyDescriptor;
+import com.monday.androidweb.lib.BaseController;
 import com.monday.androidweb.lib.annotations.Controller;
 import com.monday.androidweb.lib.annotations.PathVariable;
 import com.monday.androidweb.lib.annotations.RequestMapping;

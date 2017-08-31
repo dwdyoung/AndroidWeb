@@ -1,6 +1,6 @@
 package com.gonsin.androidweb.samples;
 
-import com.gonsin.androidweb.BaseController;
+import com.monday.androidweb.lib.BaseController;
 import com.monday.androidweb.lib.annotations.Controller;
 import com.monday.androidweb.lib.annotations.PathVariable;
 import com.monday.androidweb.lib.annotations.RequestMapping;

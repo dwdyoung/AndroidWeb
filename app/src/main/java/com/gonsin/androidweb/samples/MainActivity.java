@@ -8,8 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.gonsin.androidweb.BaseController;
-import com.gonsin.androidweb.GonsinWebServer;
+import com.monday.androidweb.lib.BaseController;
+import com.monday.androidweb.lib.GonsinWebServer;
 import com.gonsin.androidweb.R;
 
 import java.io.File;
