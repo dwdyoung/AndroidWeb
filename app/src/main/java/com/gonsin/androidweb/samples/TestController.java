@@ -1,15 +1,15 @@
 package com.gonsin.androidweb.samples;
 
 import com.gonsin.androidweb.BaseController;
-import com.gonsin.androidweb.annotations.Controller;
-import com.gonsin.androidweb.annotations.PathVariable;
-import com.gonsin.androidweb.annotations.RequestMapping;
-import com.gonsin.androidweb.annotations.RequestMethod;
-import com.gonsin.androidweb.annotations.RequestParam;
-import com.gonsin.androidweb.annotations.ReturnType;
+import com.monday.androidweb.lib.annotations.Controller;
+import com.monday.androidweb.lib.annotations.PathVariable;
+import com.monday.androidweb.lib.annotations.RequestMapping;
+import com.monday.androidweb.lib.annotations.RequestMethod;
+import com.monday.androidweb.lib.annotations.RequestParam;
+import com.monday.androidweb.lib.annotations.ReturnType;
+
 
 import java.io.File;
-import java.util.Map;
 
 /**
  * 此类为测试类，也是项目的最终效果
@@ -29,7 +29,7 @@ public class TestController extends BaseController{
      * @return
      */
     @RequestMapping(value = "/{roomId}/test_json", method = RequestMethod.GET, returnType = ReturnType.JSON)
-    public TestBean testJson1(@RequestParam("info")String info ,@PathVariable("roomId") int roomId){
+    public TestBean testJson1(@RequestParam("info")String info , @PathVariable("roomId") int roomId){
         return new TestBean(info, roomId);
     }
 
@@ -43,15 +43,16 @@ public class TestController extends BaseController{
 
 
 
-    @RequestMapping(value = "/{roomId}/upload/test_file",method = RequestMethod.POST, returnType = ReturnType.VIEW)
+    @RequestMapping(value = "/{roomId}/upload/test_file",method = RequestMethod.POST, returnType = ReturnType.JSON)
     public TestBean testFile(@RequestParam("file")File file,@PathVariable("roomId") int roomId){
-        return new TestBean("上传成功", roomId);
+        return new TestBean(file.getPath(), roomId);
     }
 
 
     /**
      * 范例 2:
      * 以下方法表示，当我访问    /api/{roomId}/test_view  的时候，就会执行下面的方法
+     * /test/test_json ?info=xxx&key2=yyy
      * 返回  web项目的根目录/Controller名字/views/方法名.html
      * 也就是   {GonsinWebServer.rootPath}/test/views/testView.html
      * 此方法接受的Http方法不限
@@ -64,5 +65,10 @@ public class TestController extends BaseController{
     public TestBean testView(@PathVariable("roomId") int roomId, @RequestParam("info")String info){
         return new TestBean(info, roomId);
     }
+
+
+//    public TestBean testView(@PathVariable("roomId") int roomId, @RequestParam("info")String info,  @RequestParam("key2")String key2){
+//        return new TestBean(info, roomId);
+//    }
 
 }

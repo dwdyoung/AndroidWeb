@@ -1,27 +1,32 @@
 package com.gonsin.androidweb;
 
-import android.app.Application;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.gonsin.androidweb.annotations.Controller;
-import com.gonsin.androidweb.annotations.PathVariable;
-import com.gonsin.androidweb.annotations.RequestMapping;
+
+import com.gonsin.androidweb.samples.BeanInTestBean;
+import com.gonsin.androidweb.samples.TestBean;
 import com.gonsin.androidweb.samples.TestController;
+import com.googlecode.openbeans.BeanInfo;
+import com.googlecode.openbeans.IntrospectionException;
+import com.googlecode.openbeans.Introspector;
+import com.googlecode.openbeans.PropertyDescriptor;
+import com.monday.androidweb.lib.annotations.Controller;
+import com.monday.androidweb.lib.annotations.PathVariable;
+import com.monday.androidweb.lib.annotations.RequestMapping;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -448,6 +453,91 @@ public class ReflectTest {
 
     @Test
     public void test_90_reflect() {
+        TestBean testBean = new TestBean("haha",11);
+        testBean.setBeanInTestBean(new BeanInTestBean("hjx",1));
+        try {
+            Map<String, Object> map = object2Map(testBean);
+            map.get("asd");
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Map<String, Object> object2Map(Object bindings) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+
+        Map<String, Object> data = new HashMap();
+        //内省 获取对象的信息
+        BeanInfo beanInfo = Introspector.getBeanInfo(bindings.getClass());
+        //获取特性
+        PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+        //遍历特性
+        for (PropertyDescriptor propertyDescriptor : propertyDescriptors){
+            //获取属性名
+            String key = propertyDescriptor.getName();
+            if (key.equals("class")){
+                continue;
+            }
+            //获取对应属性的get方法
+            Method getter = propertyDescriptor.getReadMethod();
+            //执行方法
+            Object value = getter!=null ? getter.invoke(bindings) : null;
+            //判断是否是对象中的对象
+            if (judgeIsObjectInObject(value)){
+                //如果是，则递归，返回Map
+                value = object2Map(value);
+            }
+            data.put(key,value);
+        }
+
+        return data;
+    }
+
+    private boolean judgeIsObjectInObject(Object object) {
+        boolean IsObjectInObject = false;
+        //排除所有的基本类型
+        if (object instanceof Integer){
+            return IsObjectInObject;
+        }
+        else if (object instanceof String){
+            return IsObjectInObject;
+        }
+        else if (object instanceof Float){
+            return IsObjectInObject;
+        }
+        else if (object instanceof Double){
+            return IsObjectInObject;
+        }else {
+            IsObjectInObject = true;
+        }
+        return IsObjectInObject;
+    }
+
+
+    @Test
+    public void test_100_reflect() {
+        Object object  = new BeanInTestBean("aa",45);
+        int a = 1;
+        Object object1 = a;
+        String name  = object1.getClass().getName();
+
+        if (object instanceof Integer){
+
+        }
+        else if (object instanceof String){
+
+        }
+        else if (object instanceof Float){
+
+        }
+        else if (object instanceof Double){
+
+        }else {
+            Log.d("4564", "test_100_reflect: ");
+        }
 
     }
 

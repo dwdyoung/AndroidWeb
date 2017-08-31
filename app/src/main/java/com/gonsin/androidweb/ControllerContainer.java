@@ -2,12 +2,14 @@ package com.gonsin.androidweb;
 
 import android.util.Log;
 
-import com.gonsin.androidweb.annotations.Controller;
-import com.gonsin.androidweb.annotations.PathVariable;
-import com.gonsin.androidweb.annotations.RequestMapping;
-import com.gonsin.androidweb.annotations.RequestParam;
+
+import com.monday.androidweb.lib.annotations.Controller;
+import com.monday.androidweb.lib.annotations.PathVariable;
+import com.monday.androidweb.lib.annotations.RequestMapping;
+import com.monday.androidweb.lib.annotations.RequestParam;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import fi.iki.elonen.NanoHTTPD;
 
 /**
  * Created by Administrator on 2017/8/11.
@@ -131,7 +135,6 @@ public class ControllerContainer {
             if (strsUri.length == strsFunctionValueListItem.size()) {
                 int size = strsUri.length;
                 Boolean isOK = true; //假设匹配成功
-                int signNum = -1; //通配符对应的参数号
                 //第二层筛选，每个拆分项都相等  在某item中，每个拆分项按顺序进行比对   j的意义为正在比对的方法的第几号拆分项
                 for (int j = 0; j < size; j++) {
                     String indexInStrUri = strsUri[j];
@@ -139,9 +142,6 @@ public class ControllerContainer {
 
                     // 先判断 通配符 匹配，如果通配符通过，匹配度 + 1
                     if (indexInListItem.startsWith("{")) {
-//                        signNum = signNum + 1;
-//                        String className = functionParamListItem.get(signNum).getName();
-
                         //去掉indexInListItem中{XXX}通配符左右的括号，得到里面的值 如{roomName} -》roomName
                         String tongpei = indexInListItem.substring(1, indexInListItem.length() - 1);
                         //TODO 在方法的形参中找到 该值对应参数的类型名
@@ -214,11 +214,11 @@ public class ControllerContainer {
     /**
      *
      * @param uri 传来的uri
-     * @param paramByGet get 方式传来的参数
+     * @param paramMap get 方式传来的参数
      * @param method 对应的方法
      * @return
      */
-    public Object[] parseGetPostArgs(String uri, String paramByGet, Method method) {
+    public Object[] parseGetPostArgs(String uri, Map<String,String> paramMap, Method method, NanoHTTPD.IHTTPSession session) throws IOException, NanoHTTPD.ResponseException {
 
         int paramsNum = method.getParameterTypes().length;
         //方法的参数集合
@@ -264,23 +264,37 @@ public class ControllerContainer {
                 ArgObjects[position] = object;
             }
         }
-        if (paramByGet != null) {
+        if (paramMap != null) {
             //遍历找到RequestParam的位置，吧paramByGet放入ArgObjects数组对应位置
-            int position = -1;
             Annotation[][] annotations2 = method.getParameterAnnotations();
             for (int i = 0; i < annotations2.length; i++) //此处 i 代表了当前遍历参数的位置
                 for (int j = 0; j < annotations2[i].length; j++) {
                     Annotation annotation = annotations2[i][j];
                     RequestParam requestParam = null;
                     try {
+                        //获得当前遍历到的RequestParam标签的value
+                        //以value为map中的key,取得数据
                         requestParam = (RequestParam) annotation;
-                        position = i;
-                        break;
+                        String key = requestParam.value();
+                        Object value = paramMap.get(key); //如果是文件 则XXX.jpg
+                        int position = i;
+                        if (key.equals("file")){
+//                            Log.d("key",value.toString());
+                            Map<String, String> files = new HashMap<>();
+                            //解析请求体，将文件存入虚拟内存，并把文件在虚拟内存的路径放入files
+                            session.parseBody(files); //必须先解析body后拿paramMap才有文件在paramMap里面
+                            paramMap = session.getParms();
+                            String tempFileName = paramMap.get(key);
+                            String tmpFilePath = files.get(key);
+                            File tmpFile = new File(tmpFilePath);
+                            ArgObjects[position] = tmpFile;
+                            continue;
+                        }
+                        ArgObjects[position] = value;
                     }catch (ClassCastException e){
                         continue;
                     }
                 }
-            ArgObjects[position] = paramByGet;
         }
         return ArgObjects;
     }
@@ -343,13 +357,16 @@ public class ControllerContainer {
                     RequestParam requestParam = null;
                     try {
                         requestParam = (RequestParam) annotation;
-                        position = i;
+                        if (requestParam.value().equals("file")){
+                            position = i;
+                            ArgObjects[position] = file;
+                        }
+
                         break;
                     }catch (ClassCastException e){
                         continue;
                     }
                 }
-            ArgObjects[position] = file;
         }
         return ArgObjects;
     }
@@ -373,7 +390,6 @@ public class ControllerContainer {
                 }catch (ClassCastException e){
                     continue;
                 }
-                Log.d("rootpath value",pathVariable.value());
                 if (pathVariable.value().equals(argu)){
                     return i;
                 }
